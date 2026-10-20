@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: backend
+  datasource:
+    url: ${PERSONAL_HUB_DB_URL:jdbc:mysql://127.0.0.1:3306/personal_hub?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${PERSONAL_HUB_DB_USERNAME:personal_hub}
+    password: ${PERSONAL_HUB_DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Shanghai
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+personal-hub:
+  upload-dir: ${PERSONAL_HUB_UPLOAD_DIR:../uploads}
+  file-dir: ${PERSONAL_HUB_FILE_DIR:../uploads/files}
+  admin:
+    username: ${PERSONAL_HUB_ADMIN_USERNAME:admin}
+    password: ${PERSONAL_HUB_ADMIN_PASSWORD:}
