@@ -1,4 +1,6 @@
-:80 {
+# 站点地址由服务器 .env 中的 SITE_ADDRESS 提供，例如 hub.example.com。
+# 公网域名会自动申请并续期 Let's Encrypt 证书；未设置时退回 :80（本机调试用）。
+{$SITE_ADDRESS:::80} {
 	encode zstd gzip
 
 	handle /api/* {

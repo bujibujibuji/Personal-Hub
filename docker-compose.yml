@@ -21,6 +21,9 @@ services:
     mem_limit: 512m
 
   backend:
+    # 默认使用 GitHub Actions 推送到 GHCR 的镜像；服务器上无法访问 GHCR 时，
+    # 仍可 `docker compose build backend` 本地构建（build 配置保留为备用通道）。
+    image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER in .env}/personal-hub-backend:${TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
@@ -41,8 +44,12 @@ services:
     mem_limit: 640m
     networks:
       - private
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   web:
+    # Caddy 直接面向公网提供 HTTPS（证书自动申请续期），/api 反代到后端。
+    image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER in .env}/personal-hub-web:${TAG:-latest}
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -50,14 +57,36 @@ services:
     depends_on:
       - backend
     ports:
-      - "127.0.0.1:8081:80"
+      # IP 直连模式：App/浏览器访问 http://服务器IP:8081（端口可用 .env 的 WEB_PORT 修改）。
+      # 改用域名 + HTTPS 时，按 docs/deployment-public.md 改回 80/443 并设置 SITE_ADDRESS。
+      - "${WEB_PORT:-8081}:80"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
     mem_limit: 160m
     networks:
       - private
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # 每 2 分钟检查一次 GHCR 是否有新镜像，有则自动拉取并重建标记的服务。
+  # 挂载 Docker 登录凭证（docker login ghcr.io 的产物）用于拉取私有镜像包。
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
+    command: --label-enable --interval 120 --cleanup
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # 用 sudo docker login 登录时凭证在 /root/.docker/config.json；
+      # 若用普通用户登录则改为 ~/.docker/config.json。
+      - /root/.docker/config.json:/config.json:ro
+    mem_limit: 96m
 
 volumes:
   mysql_data:
   uploads_data:
+  caddy_data:
+  caddy_config:
 
 networks:
   private:

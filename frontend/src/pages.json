@@ -1,0 +1,90 @@
+{
+  "pages": [
+    {
+      "path": "pages/home/home",
+      "style": {
+        "navigationBarTitleText": "Personal Hub",
+        "enablePullDownRefresh": true,
+        "backgroundTextStyle": "dark"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/notes/notes",
+      "style": {
+        "navigationBarTitleText": "笔记",
+        "enablePullDownRefresh": true,
+        "backgroundTextStyle": "dark"
+      }
+    },
+    {
+      "path": "pages/note/note",
+      "style": {
+        "navigationBarTitleText": "笔记详情"
+      }
+    },
+    {
+      "path": "pages/diary/diaries",
+      "style": {
+        "navigationBarTitleText": "日记",
+        "enablePullDownRefresh": true,
+        "backgroundTextStyle": "dark"
+      }
+    },
+    {
+      "path": "pages/diary/diary",
+      "style": {
+        "navigationBarTitleText": "日记详情"
+      }
+    },
+    {
+      "path": "pages/preview/preview",
+      "style": {
+        "navigationBarTitleText": "附件预览"
+      }
+    },
+    {
+      "path": "pages/placeholder/placeholder",
+      "style": {
+        "navigationBarTitleText": "即将开放"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Personal Hub",
+    "navigationBarBackgroundColor": "#f8f9f7",
+    "backgroundColor": "#f8f9f7"
+  },
+  "tabBar": {
+    "color": "#858f8b",
+    "selectedColor": "#21594d",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "static/tab/home.png",
+        "selectedIconPath": "static/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/notes/notes",
+        "text": "笔记",
+        "iconPath": "static/tab/notes.png",
+        "selectedIconPath": "static/tab/notes-active.png"
+      },
+      {
+        "pagePath": "pages/diary/diaries",
+        "text": "日记",
+        "iconPath": "static/tab/diary.png",
+        "selectedIconPath": "static/tab/diary-active.png"
+      }
+    ]
+  }
+}

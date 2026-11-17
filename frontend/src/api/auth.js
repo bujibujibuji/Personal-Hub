@@ -1,62 +1,55 @@
-let csrf = null
+// 登录、登出与登录状态查询。
+import { rawRequest, fetchCsrf, clearSessionData, invalidateCsrf, IS_H5, getServerBase } from './request'
+import { STORAGE_KEYS, DEFAULT_SERVER } from '../config'
 
 export async function getAuthStatus() {
-  const response = await fetch('/api/auth/status')
-  if (!response.ok) return { authenticated: false, username: null }
-  return response.json()
+  const response = await rawRequest('/api/auth/status')
+  if (response.statusCode !== 200 || !response.data) return { authenticated: false, username: null }
+  return response.data
 }
 
-async function getCsrf(force = false) {
-  if (!csrf || force) {
-    const response = await fetch('/api/auth/csrf')
-    if (!response.ok) throw new Error('无法连接登录服务，请确认后端已启动。')
-    csrf = await response.json()
-  }
-  return csrf
+// 读取登录页“服务器地址”输入框应显示的值。
+export function currentServer() {
+  if (IS_H5) return ''
+  const saved = uni.getStorageSync(STORAGE_KEYS.server)
+  return String(saved || DEFAULT_SERVER)
+}
+
+export function saveServer(address) {
+  const cleaned = String(address || '').trim().replace(/\/+$/, '')
+  if (!cleaned) throw new Error('请填写服务器地址。')
+  if (!/^https?:\/\//i.test(cleaned)) throw new Error('服务器地址需要以 http:// 或 https:// 开头。')
+  const previous = getServerBase()
+  if (previous && previous !== cleaned) clearSessionData()
+  uni.setStorageSync(STORAGE_KEYS.server, cleaned)
+  return cleaned
 }
 
 export async function login(username, password) {
-  const token = await getCsrf(true)
-  const body = new URLSearchParams({ username, password })
-  const response = await fetch('/api/auth/login', {
+  const token = await fetchCsrf(true)
+  const body = `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+  const response = await rawRequest('/api/auth/login', {
     method: 'POST',
-    headers: {
+    data: body,
+    header: {
       'Content-Type': 'application/x-www-form-urlencoded',
       [token.headerName]: token.token,
     },
-    body,
   })
-  if (response.status === 401) throw new Error('用户名或密码不正确。')
-  if (!response.ok) throw new Error('登录失败，请稍后重试。')
-  csrf = null
+  if (response.statusCode === 401) throw new Error('用户名或密码不正确。')
+  if (response.statusCode < 200 || response.statusCode >= 300) throw new Error('登录失败，请稍后重试。')
+  invalidateCsrf()
   return getAuthStatus()
 }
 
-export async function apiFetch(url, options = {}) {
-  const method = (options.method || 'GET').toUpperCase()
-  const needsCsrf = !['GET', 'HEAD', 'OPTIONS'].includes(method)
-  const send = async (forceToken = false) => {
-    const headers = new Headers(options.headers || {})
-    if (needsCsrf) {
-      const token = await getCsrf(forceToken)
-      headers.set(token.headerName, token.token)
-    }
-    return fetch(url, { ...options, headers })
-  }
-  let response = await send(false)
-  if (needsCsrf && response.status === 403) {
-    csrf = null
-    response = await send(true)
-  }
-  return response
-}
-
 export async function logout() {
-  const token = await getCsrf(true)
-  const response = await fetch('/api/auth/logout', {
-    method: 'POST',
-    headers: { [token.headerName]: token.token },
-  })
-  csrf = null
-  if (!response.ok) throw new Error('退出失败，请刷新页面后重试。')
+  try {
+    const token = await fetchCsrf(true)
+    await rawRequest('/api/auth/logout', {
+      method: 'POST',
+      header: { [token.headerName]: token.token },
+    })
+  } catch { /* 即使登出请求失败，也继续清理本地会话 */ } finally {
+    clearSessionData()
+  }
 }

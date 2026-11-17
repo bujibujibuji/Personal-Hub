@@ -15,6 +15,8 @@ backend/target/
 backend/data/
 backend/.mvn/
 backend/.idea/
+# CI 自动生成的 App 热更新包，不入库
+backend/src/main/resources/app/
 *.class
 *.jar
 coverage/

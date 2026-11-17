@@ -1,5 +1,7 @@
 # Personal Hub 私人服务器部署
 
+> **注意**：`docker-compose.yml` 现在默认面向公网（web 发布 80/443，站点地址来自 `.env` 的 `SITE_ADDRESS`，镜像从 GHCR 拉取）。若要沿用本页的纯 Tailscale 私网方案，请按文末「适配当前 compose 配置」一节添加 override 文件。公网域名方案见 `docs/deployment-public.md`。
+
 适用环境：Ubuntu 22.04 服务器，供自己的手机和电脑私下访问。采用 Docker Compose 运行 MySQL、Spring Boot 和前端，Tailscale Serve 提供仅限个人 Tailnet 的 HTTPS 入口。
 
 ## 需要准备
@@ -68,3 +70,16 @@ MySQL 数据和上传文件保存在 Docker 持久化卷中，重建容器不会
 云防火墙仅需开放 SSH 管理端口。应用端口 8081 只绑定在服务器本机，MySQL 不映射到公网；网站访问经 Tailscale 私有网络进行。Tailscale 账号和手机端应用需要持续可用，手机连接 Tailscale 后才能访问。
 
 如果以后要让不安装 Tailscale 的设备访问，或者公开分享网站，再购买域名并切换为公开 HTTPS 部署；中国内地服务器还需先完成 ICP 备案。
+
+## 适配当前 compose 配置
+
+当前 `docker-compose.yml` 默认从 GHCR 拉取镜像并把 web 发布到公网 80/443。纯 Tailscale 私网部署时，在服务器项目目录创建 `docker-compose.override.yml` 把端口收回到本机：
+
+```yaml
+services:
+  web:
+    ports: !override
+      - "127.0.0.1:8081:80"
+```
+
+同时在 `.env` 中填写 `GHCR_OWNER`（GitHub 用户名）以便拉取镜像；服务器无法访问 GHCR 时，可改用本地构建：`docker compose build backend web && docker compose up -d`。`SITE_ADDRESS` 留空时 Caddy 监听 `:80`，配合上面的端口映射与 `tailscale serve --bg 8081` 即可。

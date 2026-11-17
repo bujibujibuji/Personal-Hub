@@ -18,6 +18,9 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+  error:
+    # 让 ResponseStatusException 的中文提示（如"文件不存在"）出现在响应体里，前端可直接展示。
+    include-message: always
 
 personal-hub:
   upload-dir: ${PERSONAL_HUB_UPLOAD_DIR:../uploads}
