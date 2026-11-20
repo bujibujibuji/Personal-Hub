@@ -1,4 +1,4 @@
-// 生成 uni-app 所需的 PNG 图标：底部 tabBar 图标与 App 应用图标。
+// 生成 uni-app 所需的 PNG 图标：底部 tabBar 图标（App 桌面图标见 icons/ 目录）。
 // 仅依赖 Node 内置 zlib，直接编码 PNG，避免引入图形库。
 // 用法：node tools/gen-icons.mjs
 import { deflateSync } from 'node:zlib'
@@ -213,5 +213,6 @@ writeFileSync(join(staticDir, 'tab', 'notes.png'), renderGrid(NOTES_GRID, INACTI
 writeFileSync(join(staticDir, 'tab', 'notes-active.png'), renderGrid(NOTES_GRID, ACTIVE, 5))
 writeFileSync(join(staticDir, 'tab', 'diary.png'), renderGrid(DIARY_GRID, INACTIVE, 5))
 writeFileSync(join(staticDir, 'tab', 'diary-active.png'), renderGrid(DIARY_GRID, ACTIVE, 5))
-writeFileSync(join(staticDir, 'logo.png'), renderLogo(1024))
-console.log('图标已生成到 src/static/')
+// logo.png 由用户手动维护，这里不再覆盖，仅输出一份内置演示图标供参考。
+writeFileSync(join(staticDir, 'logo-generated.png'), renderLogo(1024))
+console.log('tabBar 图标已生成到 src/static/tab/（logo.png 不再被覆盖）')

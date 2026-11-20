@@ -8,7 +8,7 @@
 - `frontend/`：uni-app 前端（编译目标：Android App + H5 网页）
 - `backend/`：Spring Boot 后端与笔记、日记 CRUD API
 - `uploads/`：图片和附件存储目录
-- `docs/`：项目设计与部署文档（App 打包见 `docs/mobile-app.md`）
+- `docs/`：项目设计与部署文档（App 打包见 `docs/mobile-app.md`，白屏排错见 `docs/app-white-screen.md`）
 - `docker-compose.yml`：服务器部署配置（MySQL、Spring Boot、H5 前端）
 
 ## 启动前端（H5 开发模式）

@@ -1,5 +1,5 @@
 // 网络层封装：统一处理服务器地址、会话 Cookie（App 端需手动维护）、CSRF 令牌和 401 跳转。
-import { STORAGE_KEYS } from '../config'
+import { DEFAULT_SERVER, STORAGE_KEYS } from '../config'
 
 // H5 平台 Cookie 由浏览器自动携带，且不允许手动设置 Cookie 头。
 export let IS_H5 = false
@@ -11,7 +11,9 @@ IS_H5 = true
 export function getServerBase() {
   if (IS_H5) return ''
   const saved = uni.getStorageSync(STORAGE_KEYS.server)
-  return String(saved || '').trim().replace(/\/+$/, '')
+  // 首次安装还没有保存地址时回退到打包配置，避免请求变成相对路径而必然失败。
+  const base = String(saved || '').trim() || String(DEFAULT_SERVER || '').trim()
+  return base.replace(/\/+$/, '')
 }
 
 export function absoluteUrl(path) {

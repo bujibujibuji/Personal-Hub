@@ -1,54 +1,64 @@
 {
-  "name": "Personal Hub",
-  "appid": "",
-  "description": "个人化生活与知识管理系统",
-  "versionName": "1.0.0",
-  "versionCode": "100",
-  "transformPx": false,
-  "vueVersion": "3",
-  "locale": "zh-Hans",
-  "app-plus": {
-    "compatible": {
-      "ignoreAppVersion": false
+    "name" : "Personal Hub",
+    "appid" : "__UNI__B90DA00",
+    "description" : "个人化生活与知识管理系统",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    "vueVersion" : "3",
+    "locale" : "zh-Hans",
+    "app-plus" : {
+        "compatible" : {
+            "ignoreAppVersion" : false
+        },
+        "unicodeutf8" : false,
+        "nvueLaunchMode" : "normal",
+        "launch_path" : "",
+        "kernel" : {
+            "jscore" : false
+        },
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "autoclose" : true,
+            "waiting" : true,
+            "delay" : 0
+        },
+        "modules" : {},
+        "distribute" : {
+            "android" : {
+                "packagename" : "com.personalhub.app",
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a" ],
+                "permissions" : [
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>"
+                ],
+                "usesCleartextTraffic" : true,
+                "minSdkVersion" : 21,
+                "targetSdkVersion" : 30
+            },
+            "ios" : {
+                "dSYMs" : false
+            },
+            "sdkConfigs" : {},
+            "icons" : {
+                "android" : {
+                    "hdpi" : "icons/72x72.png",
+                    "xhdpi" : "icons/96x96.png",
+                    "xxhdpi" : "icons/144x144.png",
+                    "xxxhdpi" : "icons/192x192.png"
+                }
+            },
+            "orientation" : [ "portrait-primary" ]
+        }
     },
-    "unicodeutf8": false,
-    "nvueLaunchMode": "normal",
-    "launch_path": "",
-    "kernel": {
-      "jscore": false
-    },
-    "splashscreen": {
-      "alwaysShowBeforeRender": true,
-      "autoclose": true,
-      "waiting": true,
-      "delay": 0
-    },
-    "modules": {},
-    "distribute": {
-      "android": {
-        "packagename": "com.personalhub.app",
-        "abiFilters": ["armeabi-v7a", "arm64-v8a"],
-        "permissions": [
-          "<uses-permission android:name=\"android.permission.INTERNET\"/>",
-          "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
-          "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\"/>",
-          "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>"
-        ],
-        "usesCleartextTraffic": true,
-        "minSdkVersion": 21,
-        "targetSdkVersion": 30
-      },
-      "ios": {},
-      "sdkConfigs": {},
-      "orientation": ["portrait-primary"]
+    "h5" : {
+        "title" : "Personal Hub",
+        "router" : {
+            "mode" : "hash",
+            "base" : "/"
+        },
+        "template" : "index.html"
     }
-  },
-  "h5": {
-    "title": "Personal Hub",
-    "router": {
-      "mode": "hash",
-      "base": "/"
-    },
-    "template": "index.html"
-  }
 }

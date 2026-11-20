@@ -5,6 +5,7 @@ dist/
 *.iws
 *.ipr
 .vscode/
+frontend/.hbuilderx/
 *.log
 .env
 .env.*

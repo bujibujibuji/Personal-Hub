@@ -7,14 +7,15 @@
     "dev:h5": "uni",
     "dev:app": "uni -p app",
     "build:h5": "uni build",
-    "build:app": "uni build -p app"
+    "build:app": "uni build -p app",
+    "check:app-syntax": "node tools/scan-syntax.cjs"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-5030420261029002",
     "@dcloudio/uni-app-plus": "3.0.0-5030420261029002",
     "@dcloudio/uni-components": "3.0.0-5030420261029002",
     "@dcloudio/uni-h5": "3.0.0-5030420261029002",
-    "marked": "^18.0.14",
+    "markdown-it": "13.0.2",
     "mp-html": "^2.5.2",
     "vue": "3.4.21"
   },

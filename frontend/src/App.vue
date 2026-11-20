@@ -2,8 +2,10 @@
 import { onLaunch } from '@dcloudio/uni-app'
 import { sessionReady } from './store/session'
 import { checkAppUpdate } from './utils/updater'
+import { installErrorListeners } from './utils/diagnostics'
 
 onLaunch(() => {
+  installErrorListeners()
   sessionReady()
   // #ifdef APP-PLUS
   checkAppUpdate()

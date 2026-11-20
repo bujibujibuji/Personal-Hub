@@ -79,9 +79,14 @@ jobs:
           node --input-type=module -e "
             import fs from 'node:fs'
             const manifest = JSON.parse(fs.readFileSync('src/manifest.json', 'utf8'))
-            manifest.versionCode = String(process.env.RELEASE_CODE)
-            manifest.versionName = '1.0.' + process.env.RELEASE_CODE
+            // 已安装 APK 的 versionCode 是 src/manifest.json 里的基准值（当前 100），
+            // 热更新包必须比它大，否则 App 永远不会提示更新。
+            const base = Number(manifest.versionCode) || 100
+            const code = base + Number(process.env.RELEASE_CODE)
+            manifest.versionCode = String(code)
+            manifest.versionName = '1.0.' + code
             fs.writeFileSync('src/manifest.json', JSON.stringify(manifest, null, 2) + '\n')
+            fs.appendFileSync(process.env.GITHUB_ENV, 'APP_VERSION_CODE=' + code + '\n')
             console.log('versionCode =', manifest.versionCode)
           "
 
@@ -90,14 +95,15 @@ jobs:
         run: |
           npm ci
           npm run build:app
+          npm run check:app-syntax
           test -f dist/build/app/manifest.json
 
       - name: 打包 wgt 并注入后端资源
         env:
-          RELEASE_CODE: ${{ github.run_number }}
+          APP_VERSION_CODE: ${{ env.APP_VERSION_CODE }}
           RELEASE_NOTES: ${{ github.event.head_commit.message }}
         run: |
-          NOTES_FILE="$RUNNER_TEMP/release-notes.txt"
+          export NOTES_FILE="$RUNNER_TEMP/release-notes.txt"
           printf '%s' "$RELEASE_NOTES" | head -n 1 | cut -c 1-120 > "$NOTES_FILE" || true
           (cd frontend/dist/build/app && zip -qr "$RUNNER_TEMP/latest.wgt" .)
           mkdir -p backend/src/main/resources/app
@@ -106,8 +112,8 @@ jobs:
             import fs from 'node:fs'
             const notes = fs.readFileSync(process.env.NOTES_FILE, 'utf8').trim() || '日常更新'
             const release = {
-              versionCode: Number(process.env.RELEASE_CODE),
-              versionName: '1.0.' + process.env.RELEASE_CODE,
+              versionCode: Number(process.env.APP_VERSION_CODE),
+              versionName: '1.0.' + process.env.APP_VERSION_CODE,
               notes,
             }
             fs.writeFileSync('backend/src/main/resources/app/release.json', JSON.stringify(release, null, 2) + '\n')

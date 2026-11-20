@@ -35,8 +35,11 @@ npm run dev:app    # App 基座调试，配合 HBuilderX“运行到手机”
 
 1. HBuilderX 打开 `frontend/` 目录（vue3 CLI 工程，HBuilderX 可直接识别）。
 2. 首次使用需要生成 AppID：双击 `src/manifest.json` → 基础配置 → “重新获取”。
-3. （可选）配置图标：`src/static/logo.png` 已提供 1024×1024 图标，在
-   manifest → App图标配置 中上传并自动生成全套尺寸。
+3. 配置图标（已完成）：桌面图标已在 `src/manifest.json` 的 `distribute.icons`
+   中配置，各尺寸 PNG 位于 `frontend/icons/`（由 `src/static/logo.png` 缩放生成）。
+   如需更换图标：替换 `src/static/logo.png` 后，在 HBuilderX 的
+   manifest → App图标配置 中重新上传 1024×1024 版本（`frontend/icons/1024x1024.png`
+   可作参考）自动生成全套尺寸，并同步更新 manifest 中的 `icons` 路径。
 4. 菜单“发行 → 原生App-云打包”：
    - Android：包名默认 `com.personalhub.app`，可自行修改；
    - 证书：个人使用选择 **公共测试证书** 即可（不上架应用商店够用）；
@@ -79,10 +82,36 @@ npm run build:h5   # 产物在 dist/build/h5
 
 | 现象 | 处理 |
 | --- | --- |
-| 登录页提示“无法连接登录服务” | 检查服务器地址、手机网络（Tailscale 是否已连接） |
+| 打开后除底部导航栏外整页空白，闪屏停留约 10 秒 | 手机系统 WebView 过旧，导致 `app-service.js` 无法解析或运行。当前构建已把语法降到 es2015、换掉需要 Chrome 64+ 的 Markdown 库，并在启动出错时弹出“启动异常”提示。请用最新代码**重新云打包**安装；若仍白屏，请把弹窗里的报错文字反馈出来。 |
+| 登录页提示“无法连接登录服务” | 检查服务器地址、手机网络（Tailscale 是否已连接）；可用手机浏览器访问 `服务器地址/api/auth/status` 验证后端是否可达 |
 | 笔记里图片不显示 | 图片对未登录访问开放（文件名为随机 UUID），确认后端已升级到包含 `GET /api/images/* permitAll` 的版本 |
 | 附件点击无反应 | 附件下载需要登录会话，重新登录后再试；个别格式手机无法预览 |
 | 上传图片失败 | 确认图片 ≤ 10MB；附件 ≤ 50MB |
 | 想换服务器地址 | 登录页修改“服务器地址”后重新登录即可，本地会话会自动清理 |
 | 启动时没有更新提示 | 服务器还没有发布过热更新包（推一次代码即可），或此前已对该版本点过“下次再说” |
 | 热更新提示“安装失败” | 更新包与已装 App 的 AppID 或基座不一致（如基座升级后），按第 2 步重新云打包安装一次 |
+
+### 白屏 / 启动异常排查
+
+> 这次的完整排错过程（通俗版）见 [app-white-screen.md](./app-white-screen.md)。
+
+App 端代码跑在手机系统 WebView 里，语法不兼容时整个 `app-service.js` 会直接解析失败，
+表现为“闪屏约 10 秒 → 除底部导航外整页空白”。构建配置已经按 Chrome 49+ 的语法降级，
+并在启动出错时弹出“启动异常”提示，正常不会再出现白屏。
+
+如果仍然白屏，按下面顺序排查：
+
+1. 确认手机能上网，并且在应用商店更新 **Android System WebView** 与 **Chrome**；
+2. 手机开启开发者选项和 USB 调试，连接电脑后运行：
+
+   ```powershell
+   # HBuilderX 自带 adb，路径按实际安装位置调整
+   & "C:\Download\HBuilderX.5.34.2026102909\HBuilderX\plugins\launcher-tools\tools\adbs\adb.exe" logcat -v time |
+     Select-String -Pattern "Uncaught|chromium|app-service|console"
+   ```
+
+   然后在手机上重新打开 App，把出现的 JS 报错发出来；
+3. 更直接的方式：HBuilderX 打开 `frontend/`，选择“运行 → 运行到手机或模拟器 →
+   运行到 Android App 基座”，控制台会显示完整的启动日志；
+4. 每次改动依赖后执行 `npm run build:app` 和 `npm run check:app-syntax`，
+   确认产物仍能通过 ES2015 语法与正则兼容性检查。
