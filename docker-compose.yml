@@ -54,7 +54,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     environment:
-      SITE_ADDRESS: ${SITE_ADDRESS:-}
+      # .env 里 SITE_ADDRESS 留空时传 ":80"（纯 HTTP）；填域名时 Caddy 自动 HTTPS。
+      # 注意不能传空字符串：Caddy 会把空的站点地址解析成全局选项块导致启动失败。
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
     restart: unless-stopped
     depends_on:
       - backend
