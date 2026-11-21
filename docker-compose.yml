@@ -70,9 +70,10 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
 
   # 每 2 分钟检查一次 GHCR 是否有新镜像，有则自动拉取并重建标记的服务。
+  # 原版 containrrr/watchtower 已停止维护且不兼容新版 Docker API，改用社区维护的分支。
   # 挂载 Docker 登录凭证（docker login ghcr.io 的产物）用于拉取私有镜像包。
   watchtower:
-    image: containrrr/watchtower
+    image: ghcr.io/nicholas-fedor/watchtower:latest
     restart: unless-stopped
     command: --label-enable --interval 120 --cleanup
     volumes:
